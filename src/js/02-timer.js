@@ -5,72 +5,72 @@ import 'notiflix/dist/notiflix-3.2.5.min.css';
 
 const startBtn = document.querySelector('button[data-start]');
 const userDate = document.querySelector('#datetime-picker');
-const d = document.querySelector('[data-days]');
-const h = document.querySelector('[data-hours]');
-const m = document.querySelector('[data-minutes]');
-const s = document.querySelector('[data-seconds]');
+const d = document.querySelector('span[data-days]');
+const h = document.querySelector('span[data-hours]');
+const m = document.querySelector('span[data-minutes]');
+const s = document.querySelector('span[data-seconds]');
 
 startBtn.disabled = true;
+let selectedDateGlobal = 0;
 
-const options = {
+startBtn.addEventListener("click", countdownTime);
+flatpickr(userDate, {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDate) {
-    if (selectedDate[0] <= new Date()) {
+    if (selectedDate[0].getTime() <= Date.now()) {
       startBtn.disabled = true;
-      Notiflix.Notify.failure('Please choose a date in the future');
-    } else {
+      Notiflix.Notify.failure('Please choose a date in the future', { timeout: 3000 });
+      return
+    } 
       startBtn.disabled = false;
+      selectedDateGlobal = selectedDate[0].getTime();
+  }
+});
 
-      startBtn.addEventListener('click', countdownTime);
+function countdownTime() {
 
-      function countdownTime() {
-        timer = setInterval(() => {
-          startBtn.disabled = true;
+  timerDOMaker(convertMs(selectedDateGlobal - Date.now()))
 
-          const dateChoosenMs = new Date(userDate.value.replace(/-/g, '/')).getTime();
-          const now = new Date().getTime();
-          const timeLeft = dateChoosenMs - now;
+  let timer = setInterval(() => {
+    const timeLeft = selectedDateGlobal - Date.now();
 
-          const { days, hours, minutes, seconds } = convertMs(timeLeft);
-          
-          d.innerHTML = days < 10 ? addLeadingZero(days) : days;
-          h.innerHTML = hours < 10 ? addLeadingZero(hours) : hours;
-          m.innerHTML = minutes < 10 ? addLeadingZero(minutes) : minutes;
-          s.innerHTML = seconds < 10 ? addLeadingZero(seconds) : seconds;
+    timerDOMaker(convertMs(timeLeft))
 
-          if (timeLeft < 1000) {
-            clearInterval(timer);
-            startBtn.disabled = false;
-          }
-          if (timeLeft === 0) {
-            return
-          }
-        }, 1000);
-      }
+    isActive = true;
 
-      function addLeadingZero(value) {
-        const stringValue = String(value);
-        return stringValue.padStart(2, '0');
-      }
-      
-      function convertMs(ms) {
-        const second = 1000;
-        const minute = second * 60;
-        const hour = minute * 60;
-        const day = hour * 24;
-
-        const days = Math.floor(ms / day);
-        const hours = Math.floor((ms % day) / hour);
-        const minutes = Math.floor(((ms % day) % hour) / minute);
-        const seconds = Math.floor((((ms % day) % hour) % minute) / second);
-
-        return { days, hours, minutes, seconds };
-      }
+    if (timeLeft < 1000) {
+      clearInterval(timer);
+      isActive = false;
+      Notiflix.Notify.success('Time is over',{ timeout: 6000, },);
+      startBtn.disabled = true;
     }
-  },
-};
+  }, 1000);
+}
 
-flatpickr(userDate, options);
+function timerDOMaker({ days, hours, minutes, seconds }) {
+    d.textContent = days;
+    h.textContent = hours;
+    m.textContent = minutes;
+    s.textContent = seconds;
+}
+
+function convertMs(ms) {
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+
+  const days = addLeadingZero(Math.floor(ms / day));
+  const hours = addLeadingZero(Math.floor((ms % day) / hour));
+  const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
+  const seconds = addLeadingZero(Math.floor((((ms % day) % hour) % minute) / second));
+
+  return { days, hours, minutes, seconds };
+}
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
