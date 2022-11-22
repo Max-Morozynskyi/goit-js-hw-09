@@ -20,10 +20,14 @@ function startBlinck() {
   magicCode = setInterval(bgColorSwitch, 1000);
   startBtn.disabled = true;
   stopBtn.disabled = false;
+  startBtn.isActive = false;
+  stopBtn.isActive = true;
 }
 
 function stopBlinck() {
   clearInterval(magicCode);
   startBtn.disabled = false;
   stopBtn.disabled = true;
+  startBtn.isActive = true;
+  stopBtn.isActive = false;
 }
