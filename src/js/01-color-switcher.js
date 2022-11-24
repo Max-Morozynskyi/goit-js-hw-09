@@ -10,6 +10,7 @@ const clickStartBtn = startBtn.addEventListener('click', startBlinck);
 const clickStopBtn = stopBtn.addEventListener('click', stopBlinck);
 
 stopBtn.disabled = true;
+let magicCode;
 
 function bgColorSwitch() {
   body.style.backgroundColor = getRandomHexColor();

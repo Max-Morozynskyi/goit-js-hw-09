@@ -39,7 +39,7 @@ function countdownTime() {
 
     timerDOMaker(convertMs(timeLeft))
 
-    isActive = true;
+    let isActive = true;
 
     if (timeLeft < 1000) {
       clearInterval(timer);
